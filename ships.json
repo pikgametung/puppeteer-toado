@@ -1,22 +1,27 @@
 [
   {
-    "vessel_id": "4242a254-f3bf-4bf0-bbac-764dfc84f31c",
+    "id": "4242a254-f3bf-4bf0-bbac-764dfc84f31c",
     "name": "HOANG HAI ACE",
-    "ship_id": "736941" 
+    "ship_id": "736941",
+    "organization_id": "5073584d-1262-4f0b-b433-cf0520dd5352"
   },
   {
-    "vessel_id": "0c824eae-2c1c-4ac0-b158-57954ca330ec",
+    "id": "0c824eae-2c1c-4ac0-b158-57954ca330ec",
     "name": "HOANG HAI STAR",
-    "ship_id": "736980"
+    "ship_id": "736980",
+    "organization_id": "5073584d-1262-4f0b-b433-cf0520dd5352"
   },
   {
-    "vessel_id": "a411889d-0cf1-4f90-a435-87d7e3ce2174",
+    "id": "a411889d-0cf1-4f90-a435-87d7e3ce2174",
     "name": "HOANG HAI 268",
-    "ship_id": "5983890"
+    "ship_id": "5983890",
+    "organization_id": "5073584d-1262-4f0b-b433-cf0520dd5352"
   },
   {
-    "vessel_id": "d1f736f4-845a-4e83-9dad-2e6430762f01",
+    "id": "d1f736f4-845a-4e83-9dad-2e6430762f01",
     "name": "HOANG HAI 68",
-    "ship_id": "736030"
+    "ship_id": "736030",
+    "organization_id": "5073584d-1262-4f0b-b433-cf0520dd5352"
   }
 ]
+
