@@ -29,8 +29,8 @@ async function getShipData(ship) {
   args: [
     "--no-sandbox",
     "--disable-setuid-sandbox",
-    "--disable-dev-shm-usage",
-    "--disable-blink-features=AutomationControlled",
+    "--disable-gpu",
+    "--window-size=1920,1080",
   ],
   });
 
@@ -42,6 +42,8 @@ async function getShipData(ship) {
   try {
     const url = `https://www.marinetraffic.com/en/ais/home/shipid:${ship.ship_id}/zoom:10`;
     console.log(`🛰️ Đang truy cập: ${ship.name} (${url})`);
+    await page.waitForSelector('body', { timeout: 10000 });
+    await page.waitForTimeout(5000); // đợi bản đồ render ổn định
     await page.goto(url, { waitUntil: "networkidle2", timeout: 90000 });
 
     // Popup cookie
@@ -191,3 +193,4 @@ async function getShipData(ship) {
   }
   console.log("\n🎯 Hoàn tất xử lý tất cả tàu!");
 })();
+
