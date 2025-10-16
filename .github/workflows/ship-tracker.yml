@@ -2,7 +2,7 @@ name: Run Ship Tracker
 
 on:
   schedule:
-    - cron: "0 */3 * * *"   # chạy mỗi 3 tiếng một lần (UTC)
+    - cron: "0 */1 * * *"   # chạy mỗi 3 tiếng một lần (UTC)
   workflow_dispatch:         # cho phép bấm “Run workflow” thủ công
 
 jobs:
