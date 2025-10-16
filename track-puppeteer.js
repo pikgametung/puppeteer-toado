@@ -46,7 +46,16 @@ async function getShipData(ship) {
 
     await page.waitForSelector("body", { timeout: 10000 });
     await delay(8000); // đợi bản đồ và popup render đầy đủ
-
+      // Di chuột đến icon tàu
+    const shipIcons = await page.$$('div.leaflet-marker-icon');
+    if (shipIcons.length > 0) {
+      const box = await shipIcons[0].boundingBox();
+      if (box) {
+        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        console.log("🖱️ Đã di chuột đến icon tàu...");
+        await delay(4000);
+      }
+    }  
     // 🧭 Lấy text toàn trang
     const pageText = await page.evaluate(() => document.body.innerText);
 
@@ -113,7 +122,24 @@ async function getShipData(ship) {
         console.log("ℹ️ Hành trình đã tồn tại, không ghi lại.");
       }
     }
+    // ====== Chụp ảnh khu vực bản đồ ======
+    const screenshotPath = `./${ship.name.replace(/\s+/g, "_")}_map.png`;
+    const screenshotRegion = { x: 1150, y: 250, width: 750, height: 850 };
+    await page.screenshot({ path: screenshotPath, clip: screenshotRegion });
+    console.log("📸 Đã chụp ảnh khu vực bản đồ.");
 
+    // ====== Upload ảnh lên Supabase Storage ======
+    const imageFile = fs.readFileSync(screenshotPath);
+    const { error: uploadError } = await supabase.storage
+      .from("ship-images")
+      .upload(`${ship.name.replace(/\s+/g, "_")}_map.png`, imageFile, {
+        contentType: "image/png",
+        upsert: true,
+      });
+    if (uploadError) throw new Error("Upload ảnh lỗi: " + uploadError.message);
+
+    const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/ship-images/${ship.name.replace(/\s+/g, "_")}_map.png`;
+    
     // === Cập nhật bảng ships ===
     const { error: shipErr } = await supabase.from("ships").upsert([
       {
@@ -146,3 +172,4 @@ async function getShipData(ship) {
     await delay(5000);
   }
 })();
+
