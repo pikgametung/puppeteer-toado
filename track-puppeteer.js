@@ -131,7 +131,7 @@ async function getShipData(ship) {
     }
     // ====== Chụp ảnh khu vực bản đồ ======
     const screenshotPath = `./${ship.name.replace(/\s+/g, "_")}_map.png`;
-    const screenshotRegion = { x: 610, y: 140, width: 750, height: 800 };
+    const screenshotRegion = { x: 700, y: 150, width: 900, height: 700 };
     await page.screenshot({ path: screenshotPath, clip: screenshotRegion });
     console.log("📸 Đã chụp ảnh khu vực bản đồ.");
 
@@ -179,6 +179,7 @@ async function getShipData(ship) {
     await delay(5000);
   }
 })();
+
 
 
 
