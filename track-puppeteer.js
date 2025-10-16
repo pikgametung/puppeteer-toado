@@ -41,7 +41,7 @@ async function getShipData(ship) {
 
   try {
     const url = `https://www.marinetraffic.com/en/ais/home/shipid:${ship.ship_mt_id}/zoom:10`;
-    console.log(`🔗 Mở bản đồ: ${url}`);
+    console.log(`🛰️ Đang truy cập: ${ship.name} (${url})`);
     await page.goto(url, { waitUntil: "networkidle2", timeout: 90000 });
 
       // Popup cookie
@@ -52,7 +52,6 @@ async function getShipData(ship) {
     } catch {
       console.log("ℹ️ Không thấy popup cookie.");
     }
-
     await delay(7000);
       // Di chuột đến icon tàu
     const shipIcons = await page.$$('div.leaflet-marker-icon');
@@ -180,5 +179,6 @@ async function getShipData(ship) {
     await delay(5000);
   }
 })();
+
 
 
