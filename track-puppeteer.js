@@ -44,8 +44,16 @@ async function getShipData(ship) {
     console.log(`🔗 Mở bản đồ: ${url}`);
     await page.goto(url, { waitUntil: "networkidle2", timeout: 90000 });
 
-    await page.waitForSelector("body", { timeout: 10000 });
-    await delay(8000); // đợi bản đồ và popup render đầy đủ
+      // Popup cookie
+    try {
+      await page.waitForSelector('button[class*="css-1yp8yiu"] span', { timeout: 7000 });
+      await page.click('button[class*="css-1yp8yiu"] span');
+      console.log("✅ Đã nhấn AGREE để tắt popup cookie.");
+    } catch {
+      console.log("ℹ️ Không thấy popup cookie.");
+    }
+
+    await delay(7000);
       // Di chuột đến icon tàu
     const shipIcons = await page.$$('div.leaflet-marker-icon');
     if (shipIcons.length > 0) {
@@ -172,4 +180,5 @@ async function getShipData(ship) {
     await delay(5000);
   }
 })();
+
 
