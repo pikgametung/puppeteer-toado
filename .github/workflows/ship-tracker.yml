@@ -1,26 +1,35 @@
-name: Ship Tracker Auto
+name: Run Ship Tracker
+
 on:
   schedule:
-    - cron: "0 */3 * * *"  # chạy mỗi 3 tiếng
-  workflow_dispatch:
+    - cron: "0 */3 * * *"   # chạy mỗi 3 tiếng một lần (UTC)
+  workflow_dispatch:         # cho phép bấm “Run workflow” thủ công
 
 jobs:
-  track:
+  run-tracker:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run Puppeteer tracker
+      - name: Run Puppeteer Tracker (headful with xvfb)
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: node track-puppeteer.js
+          # Nếu bạn có thêm ENV khác (VD: ORGANIZATION_ID, USER_ID, …)
+          ORGANIZATION_ID: ${{ secrets.ORGANIZATION_ID }}
+          USER_ID: ${{ secrets.USER_ID }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          # tạo màn hình ảo cho Chrome
+          xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' node track-puppeteer.js
