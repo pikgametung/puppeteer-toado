@@ -129,6 +129,32 @@ async function getShipData(ship) {
         console.log("ℹ️ Hành trình đã tồn tại, không ghi lại.");
       }
     }
+    //=========test thử tự động chụp chính xác vùng ảnh=====
+    const popup = await page.$('div.leaflet-popup-content');
+if (popup) {
+  const box = await popup.boundingBox();
+  if (box) {
+    await page.screenshot({
+      path: screenshotPath,
+      clip: {
+        x: box.x - 10,  // thêm viền nhỏ
+        y: box.y - 10,
+        width: box.width + 20,
+        height: box.height + 20,
+      },
+    });
+    console.log(`📸 Đã chụp popup chính xác (${Math.round(box.width)}×${Math.round(box.height)})`);
+  } else {
+    console.log("⚠️ Không lấy được boundingBox, dùng vùng mặc định.");
+  }
+} else {
+  console.log("⚠️ Không tìm thấy popup, dùng vùng mặc định.");
+  await page.screenshot({
+    path: screenshotPath,
+    clip: { x: 1220, y: 180, width: 420, height: 780 },
+  });
+}
+    
     // ====== Chụp ảnh khu vực bản đồ ======
     const screenshotPath = `./${ship.name.replace(/\s+/g, "_")}_map.png`;
     const viewport = await page.viewport();
@@ -180,6 +206,7 @@ async function getShipData(ship) {
     await delay(5000);
   }
 })();
+
 
 
 
