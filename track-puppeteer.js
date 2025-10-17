@@ -130,38 +130,42 @@ async function getShipData(ship) {
       }
     }
     //=========test thử tự động chụp chính xác vùng ảnh=====
-    const popup = await page.$('div.leaflet-popup-content');
-if (popup) {
-  const box = await popup.boundingBox();
-  if (box) {
+    // === 5️⃣ Chụp ảnh vùng popup tàu ===
+const screenshotPath = `./${VESSEL_NAME.replace(/\s+/g, "_")}_popup.png`;
+
+try {
+  // Thử tìm vùng popup thật
+  const popup = await page.$('div.leaflet-popup-content');
+  if (popup) {
+    const box = await popup.boundingBox();
+    if (box) {
+      await page.screenshot({
+        path: screenshotPath,
+        clip: {
+          x: box.x - 15, // thêm viền nhẹ để không cắt chữ
+          y: box.y - 25,
+          width: box.width + 30,
+          height: box.height + 50,
+        },
+      });
+      console.log(`📸 Đã chụp chính xác popup (${Math.round(box.width)}×${Math.round(box.height)})`);
+    } else {
+      console.warn("⚠️ Không lấy được boundingBox, dùng vùng mặc định.");
+      await page.screenshot({
+        path: screenshotPath,
+        clip: { x: 1220, y: 180, width: 420, height: 780 },
+      });
+    }
+  } else {
+    console.warn("⚠️ Không tìm thấy popup, dùng vùng mặc định.");
     await page.screenshot({
       path: screenshotPath,
-      clip: {
-        x: box.x - 10,  // thêm viền nhỏ
-        y: box.y - 10,
-        width: box.width + 20,
-        height: box.height + 20,
-      },
+      clip: { x: 1220, y: 180, width: 420, height: 780 },
     });
-    console.log(`📸 Đã chụp popup chính xác (${Math.round(box.width)}×${Math.round(box.height)})`);
-  } else {
-    console.log("⚠️ Không lấy được boundingBox, dùng vùng mặc định.");
   }
-} else {
-  console.log("⚠️ Không tìm thấy popup, dùng vùng mặc định.");
-  await page.screenshot({
-    path: screenshotPath,
-    clip: { x: 1220, y: 180, width: 420, height: 780 },
-  });
+} catch (screenshotErr) {
+  console.error("⚠️ Lỗi khi chụp popup:", screenshotErr.message);
 }
-    
-    // ====== Chụp ảnh khu vực bản đồ ======
-    const screenshotPath = `./${ship.name.replace(/\s+/g, "_")}_map.png`;
-    const viewport = await page.viewport();
-    
-    await page.screenshot({ path: screenshotPath, clip: screenshotRegion });
-    console.log("📸 Đã chụp ảnh khu vực bản đồ.");
-
     // ====== Upload ảnh lên Supabase Storage ======
     const imageFile = fs.readFileSync(screenshotPath);
     const { error: uploadError } = await supabase.storage
@@ -206,6 +210,7 @@ if (popup) {
     await delay(5000);
   }
 })();
+
 
 
 
