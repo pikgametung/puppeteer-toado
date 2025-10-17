@@ -130,23 +130,11 @@ async function getShipData(ship) {
       }
     }
     //=========test thử tự động chụp chính xác vùng ảnh=====
-// === 5️⃣ Chụp ảnh vùng bản đồ mặc định (chính giữa popup) ===
-const screenshotPath = `./${VESSEL_NAME.replace(/\s+/g, "_")}_map.png`;
-
-try {
-  // Kích thước khung popup + vùng bản đồ quanh tàu (chuẩn tỷ lệ 1920x1080)
-  const screenshotRegion = {
-    x: 900,   // đẩy sang trái (centered so với màn hình)
-    y: 200,   // từ trên xuống
-    width: 650, // chiều rộng vùng popup + bản đồ
-    height: 780, // chiều cao khung popup
-  };
-
-  await page.screenshot({ path: screenshotPath, clip: screenshotRegion });
-  console.log(`📸 Đã chụp vùng popup tàu (${screenshotRegion.width}x${screenshotRegion.height})`);
-} catch (err) {
-  console.error("⚠️ Lỗi khi chụp ảnh:", err.message);
-}
+ // --- Chụp ảnh bản đồ ---
+    const screenshotPath = `./${VESSEL_NAME.replace(/\s+/g, "_")}_map.png`;
+    const screenshotRegion = { x: 900, y: 200, width: 650, height: 780 };
+    await page.screenshot({ path: screenshotPath, clip: screenshotRegion });
+    console.log(`📸 Đã chụp ảnh bản đồ: ${screenshotPath}`);
 
     // ====== Upload ảnh lên Supabase Storage ======
     const imageFile = fs.readFileSync(screenshotPath);
@@ -192,6 +180,7 @@ try {
     await delay(5000);
   }
 })();
+
 
 
 
