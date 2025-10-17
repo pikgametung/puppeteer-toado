@@ -130,42 +130,24 @@ async function getShipData(ship) {
       }
     }
     //=========test thử tự động chụp chính xác vùng ảnh=====
-    // === 5️⃣ Chụp ảnh vùng popup tàu ===
-const screenshotPath = `./${VESSEL_NAME.replace(/\s+/g, "_")}_popup.png`;
+// === 5️⃣ Chụp ảnh vùng bản đồ mặc định (chính giữa popup) ===
+const screenshotPath = `./${VESSEL_NAME.replace(/\s+/g, "_")}_map.png`;
 
 try {
-  // Thử tìm vùng popup thật
-  const popup = await page.$('div.leaflet-popup-content');
-  if (popup) {
-    const box = await popup.boundingBox();
-    if (box) {
-      await page.screenshot({
-        path: screenshotPath,
-        clip: {
-          x: box.x - 15, // thêm viền nhẹ để không cắt chữ
-          y: box.y - 25,
-          width: box.width + 30,
-          height: box.height + 50,
-        },
-      });
-      console.log(`📸 Đã chụp chính xác popup (${Math.round(box.width)}×${Math.round(box.height)})`);
-    } else {
-      console.warn("⚠️ Không lấy được boundingBox, dùng vùng mặc định.");
-      await page.screenshot({
-        path: screenshotPath,
-        clip: { x: 1220, y: 180, width: 420, height: 780 },
-      });
-    }
-  } else {
-    console.warn("⚠️ Không tìm thấy popup, dùng vùng mặc định.");
-    await page.screenshot({
-      path: screenshotPath,
-      clip: { x: 1220, y: 180, width: 420, height: 780 },
-    });
-  }
-} catch (screenshotErr) {
-  console.error("⚠️ Lỗi khi chụp popup:", screenshotErr.message);
+  // Kích thước khung popup + vùng bản đồ quanh tàu (chuẩn tỷ lệ 1920x1080)
+  const screenshotRegion = {
+    x: 900,   // đẩy sang trái (centered so với màn hình)
+    y: 200,   // từ trên xuống
+    width: 650, // chiều rộng vùng popup + bản đồ
+    height: 780, // chiều cao khung popup
+  };
+
+  await page.screenshot({ path: screenshotPath, clip: screenshotRegion });
+  console.log(`📸 Đã chụp vùng popup tàu (${screenshotRegion.width}x${screenshotRegion.height})`);
+} catch (err) {
+  console.error("⚠️ Lỗi khi chụp ảnh:", err.message);
 }
+
     // ====== Upload ảnh lên Supabase Storage ======
     const imageFile = fs.readFileSync(screenshotPath);
     const { error: uploadError } = await supabase.storage
@@ -210,6 +192,7 @@ try {
     await delay(5000);
   }
 })();
+
 
 
 
