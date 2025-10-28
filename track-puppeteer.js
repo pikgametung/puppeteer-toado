@@ -127,12 +127,14 @@ async function getShipData(ship) {
         else console.log("✅ Đã ghi hành trình mới vào trips");
       } else {
         console.log("ℹ️ Hành trình đã tồn tại, không ghi lại.");
+        delay(500);
       }
     }
     //=========test thử tự động chụp chính xác vùng ảnh=====
  // --- Chụp ảnh bản đồ ---
     const screenshotPath = `./${ship.name.replace(/\s+/g, "_")}_map.png`;
     const screenshotRegion = { x: 900, y: 450, width: 650, height: 600 };
+    delay(500);
     await page.screenshot({ path: screenshotPath, clip: screenshotRegion });
     console.log(`📸 Đã chụp ảnh bản đồ: ${screenshotPath}`);
 
@@ -180,6 +182,7 @@ async function getShipData(ship) {
     await delay(5000);
   }
 })();
+
 
 
 
