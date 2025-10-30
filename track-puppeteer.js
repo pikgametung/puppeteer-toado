@@ -67,21 +67,39 @@ async function getShipData(ship) {
     const pageText = await page.evaluate(() => document.body.innerText);
 
     // === Lấy hành trình ===
-    const routeMatch =
-      pageText.match(/VN\s+\w+\s+VN\s+\w+/) ||
-      pageText.match(/([A-Z]{2,3}\s*[A-Z]{2,3})\s*→\s*([A-Z]{2,3}\s*[A-Z]{2,3})/) ||
-      pageText.match(/Route:\s*([A-Z\s\-→]+)/i);
+// 🔹 Hàm xử lý an toàn cho ngày tháng
+function safeParseDate(str) {
+  if (!str) return null;
+  try {
+    // Loại bỏ ký tự lạ, dấu xuống dòng, chữ "UTC"
+    const cleaned = str.replace(/[^\d\-:T\s]/g, "").trim();
+    const d = new Date(cleaned);
+    return isNaN(d.getTime()) ? null : d;
+  } catch {
+    return null;
+  }
+}
 
-    const atdMatch = pageText.match(/ATD[:\s]*([\d\-:\s]+)/i);
-    const etaMatch = pageText.match(/ETA[:\s]*([\d\-:\s]+)/i) || pageText.match(/Reported ETA[:\s]*([\d\-:\s]+)/i);
+// 🔹 Tìm dữ liệu trên trang
+const routeMatch =
+  pageText.match(/VN\s+\w+\s+VN\s+\w+/) ||
+  pageText.match(/([A-Z]{2,3}\s*[A-Z]{2,3})\s*→\s*([A-Z]{2,3}\s*[A-Z]{2,3})/) ||
+  pageText.match(/Route[:\s]*([A-Z\s\-→]+)/i);
 
-    const route = routeMatch ? routeMatch[0].trim().replace(/\s+/g, " ") : "Unknown Route";
-    const atd = atdMatch ? new Date(atdMatch[1]) : null;
-    const eta = etaMatch ? new Date(etaMatch[1]) : null;
+const atdMatch = pageText.match(/ATD[:\s]*([^\n]+)/i);
+const etaMatch =
+  pageText.match(/ETA[:\s]*([^\n]+)/i) ||
+  pageText.match(/Reported ETA[:\s]*([^\n]+)/i);
 
-    console.log(`🚢 Hành trình: ${route}`);
-    console.log(`🕓 ATD: ${atd}`);
-    console.log(`🕓 ETA: ${eta}`);
+// 🔹 Làm sạch và gán giá trị
+const route = routeMatch ? routeMatch[0].trim().replace(/\s+/g, " ") : "Unknown Route";
+const atd = safeParseDate(atdMatch ? atdMatch[1] : null);
+const eta = safeParseDate(etaMatch ? etaMatch[1] : null);
+
+// 🔹 Log để kiểm tra
+console.log(`🚢 Hành trình: ${route}`);
+console.log(`🕓 ATD: ${atd ? atd.toISOString() : "null"}`);
+console.log(`🕓 ETA: ${eta ? eta.toISOString() : "null"}`);
 
     // === Lấy toạ độ, tốc độ, hướng ===
     const coordMatch = pageText.match(/\(([-+]?\d+\.\d+),\s*([-+]?\d+\.\d+)\)/);
@@ -180,6 +198,7 @@ async function getShipData(ship) {
     await delay(5000);
   }
 })();
+
 
 
 
